@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 93: Feeling unwell — онлайн-урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f8fc;--card:#fff;--ink:#23364a;--mute:#6b7f94;--line:#dbe6f0;--blue:#3b82d6;--blue-l:#e4f0fc;--green:#27a778;--green-l:#e0f6ec;--red:#e0566a;--red-l:#fde8eb;--sun:#ffb938;--sun-l:#fff4d9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Nunito,system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:2px solid var(--line);padding:10px 16px}
+.top{max-width:860px;margin:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{font-size:1.1rem;margin:0;font-weight:800;flex:1;min-width:200px}
+.score{font-weight:800;background:var(--sun-l);border-radius:20px;padding:4px 14px}
+.bar{max-width:860px;margin:8px auto 0;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .4s}
+nav{max-width:860px;margin:14px auto 0;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap}
+nav button{font:inherit;font-weight:700;border:2px solid var(--line);background:#fff;color:var(--ink);padding:8px 16px;border-radius:14px;cursor:pointer}
+nav button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+nav button.full::after{content:" ✔"}
+main{max-width:860px;margin:auto;padding:14px 16px 60px}
+.panel{display:none}.panel.on{display:block}
+.intro{background:var(--blue-l);border-radius:16px;padding:14px 18px;margin-bottom:16px}
+.intro p{margin:4px 0}
+.ex{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:18px}
+.ex h2{margin:0;font-size:1.15rem}
+.ex .ins{color:var(--mute);margin:2px 0 10px}
+.ex .sc{float:right;font-weight:800;color:var(--blue)}
+.item{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.item .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--blue-l);color:var(--blue);font-weight:800;text-align:center;line-height:28px}
+.item .b{flex:1}.item .q{margin:0 0 6px}
+.blank{display:inline-block;width:70px;border-bottom:2px solid var(--ink);margin:0 3px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap}
+.ctl button,.ctl input{font:inherit;border-radius:10px;border:2px solid var(--line);padding:6px 12px;background:#fff;color:var(--ink)}
+.ctl button{cursor:pointer;font-weight:600}
+.ctl button:hover:not(:disabled){border-color:var(--blue);background:var(--blue-l)}
+.ctl button:disabled{opacity:.45;cursor:default}
+.ctl .go{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ctl input{min-width:200px}
+.fb{margin:4px 0 0;font-weight:600;min-height:1px}
+.item.ok .n{background:var(--green);color:#fff}.item.ok .fb{color:var(--green)}
+.item.bad .n{background:var(--red);color:#fff}.item.bad .fb{color:var(--red)}
+.card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:16px}
+.card h3{margin:0 0 6px}
+.who{background:var(--sun-l);border-radius:12px;padding:8px 12px;margin:8px 0}
+.ph{color:var(--blue);font-weight:600}
+.chk{display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:700;cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--green)}
+.next{text-align:center;margin-top:8px;font-weight:800}
+.next button{font:inherit;font-weight:800;background:var(--green);color:#fff;border:none;border-radius:14px;padding:12px 24px;cursor:pointer}
+.next button:hover{filter:brightness(1.08)}
+.reset{background:none;border:none;color:var(--mute);text-decoration:underline;cursor:pointer;font:inherit}
+.np{color:var(--mute);font-weight:700;margin:8px 0 0}
+.rank{font-weight:800}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><h1>Unit 93: «Feeling unwell»</h1><span class="rank" id="rank"></span><span class="score">⭐ <span id="pts">0</span> / <span id="max">0</span></span></div>
+ <div class="bar"><i id="fill"></i></div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<main style="padding-top:0;text-align:center"><button class="reset" id="reset">Почати спочатку (скинути бали)</button></main>
+<script>
+const E=(c,w)=>["Обери правильне речення.",[c],[c,w]];
+const M=(q,a,...o)=>[q,[a],[a,...o]];
+const TABS=[
+{id:'gr',name:'💡 should & Imperatives',intro:'<p><b>should + дієслово</b> — гарна ідея, порада: <i>You should stay in bed.</i> <b>shouldn\'t + дієслово</b> — погана ідея: <i>Tom shouldn\'t eat sweets.</i></p><p>🧠 Лайфхак: після should / shouldn\'t дієслово завжди в початковій формі БЕЗ to (should visit, а не should to visit)!</p><p><b>Наказовий спосіб:</b> починай прямо з дієслова — <i>Cover your mouth!</i> Для заборони став <b>Don\'t</b> на початку — <i>Don\'t drink cold water!</i></p><p>🧠 Лайфхак: ніяких you чи must — просто дієслово, а для заборони Don\'t.</p>',ex:['g3','g4','g5']},
+{id:'vocab',name:'🧩 Vocabulary',intro:'<p>to take medicine — приймати ліки · to take temperature — міряти температуру · to stay in bed — лежати в ліжку · to take a nap — подрімати · a bruise — синець · a cut — поріз · a scratch — подряпина · to catch a virus — підхопити вірус · to sanitise your hands — дезінфікувати руки · to wear a mask — носити маску · a band-aid — лейкопластир · to get stuck — застрягнути · a runny nose — нежить · to sneeze — чхати · to cough — кашляти · to cover — прикривати · earache — біль у вусі · toothache — зубний біль · headache — головний біль · backache — біль у спині · a fever — висока температура · prescription — рецепт · pharmacy — аптека · get well — одужувати</p>',ex:['v1']},
+{id:'phr',name:'💬 Phrases',intro:'<p>🔵 <b>Спитати про здоров\'я:</b> What\'s the matter? · What\'s wrong? · How do you feel? · What happened?</p><p>🟠 <b>Описати симптоми:</b> I have a runny nose. · My back hurts. · I\'ve got an earache. · I caught a virus.</p><p>🟢 <b>Порадити:</b> You should stay in bed. · Take this medicine twice a day. · Here\'s your prescription. · Get well soon!</p>',ex:['f2']},
+{id:'speak',name:'🎤 Speaking',intro:'<p>Працюй у парі. Усі завдання подано українською, а розмовляти треба англійською. Виконали завдання разом — познач галочку й отримай бали. Макро-сценарії й дискусії в кінці — без балів, для практики.</p>',ex:[]}
+];
+const EX={
+v1:{t:'Вправа 1. Слово в реченні',i:'Обери слово, яке підходить за змістом.',items:[
+M("If you cut your finger while cooking, you should cover it with a ___.","band-aid","thermometer","tissue"),
+M("Before eating lunch at school, all students must ___ their hands with soap or sanitiser.","sanitise","sneeze","cough"),
+M("Mary tripped over a rock in the park and got a big purple ___ on her leg.","bruise","scratch","fever"),
+M("You look very tired today; you should lie down and ___ a short nap.","take","stay","wear"),
+M("When you feel unwell, the doctor will use a thermometer to ___ your temperature.","take","catch","cover"),
+M("Please ___ your mouth with a tissue when you cough or sneeze.","cover","stuck","hurt"),
+M("Tom has got a high fever and a terrible headache because he ___ a virus at school.","caught","stayed","sanitised"),
+M("After the doctor examined Mark, she gave him a ___ to buy medicine at the pharmacy.","prescription","bruise","scratch"),
+M("Max was playing in the wardrobe during hide-and-seek and suddenly got ___.","stuck","unwell","allergic"),
+M("Anna has a very bad cold, so she has a ___ nose and needs a lot of tissues.","runny","colorful","stuck")]},
+f2:{t:'Вправа 2. Діалоги',i:'Обери відповідь для Speaker B.',items:[
+M("A: «What\'s the matter with you, Tom?»<br>B: «___. My head hurts a lot.»","I have a terrible headache","I take medicine twice a day","You should stay in bed"),
+M("A: «I\'ve got a bad cut on my hand!»<br>B: «___! Let me put a band-aid on it.»","Poor thing","Get well soon","Sounds great"),
+M("A: «I have a high fever and a sore throat.»<br>B: «___.»","You should stay in bed and call a doctor","You should go out to the mall","You shouldn\'t take your temperature"),
+M("A: «How often should I take this syrup?»<br>B: «___.»","You should take it twice a day after meals","I have got an earache","It is a wonderful prescription"),
+M("A: «Achoo! I can\'t stop sneezing today!»<br>B: «___! Are you allergic to my cat?»","Bless you","You shouldn\'t sleep","Don\'t cover your mouth"),
+M("A: «My tooth hurts so much I can\'t eat!»<br>B: «___.»","You should visit a dentist right away","You should eat some more sweets","You shouldn\'t sanitise your hands"),
+M("A: «I\'m feeling much better today, thank you!»<br>B: «___! I\'m happy to hear that.»","That\'s great news","What\'s wrong","Don\'t be late"),
+M("A: «I have a bad cough and a runny nose.»<br>B: «___.»","Here is a tissue, and you should drink warm tea","You should do a lot of sport","You shouldn\'t wear a mask"),
+M("A: «I\'m going home now because I feel sick.»<br>B: «___! I hope you feel better tomorrow.»","Get well soon","You\'re welcome","What happened"),
+M("A: «Where can I buy these pills?»<br>B: «___.»","You can get them at the pharmacy nearby","You should look it up in the book","You should stay stuck at home")]},
+g3:{t:'Вправа 3. Правильне речення (A/B)',i:'Яке речення правильне?',items:[
+E("You should stay in bed when you have a fever.","You should to stay in bed when you have a fever."),
+E("Anna shouldn\'t eat sweets when her tooth hurts.","Anna shouldn\'t eats sweets when her tooth hurts."),
+E("Sanitise your hands before you touch food!","Sanitising your hands before you touch food!"),
+E("You shouldn\'t go to school if you are ill.","You doesn\'t should go to school if you are ill."),
+E("Cover your mouth when you cough!","Covers your mouth when you cough!"),
+E("Tom should take his medicine twice a day.","Tom should takes his medicine twice a day."),
+E("Don\'t touch your eyes with dirty hands!","Not touch your eyes with dirty hands!"),
+E("Children shouldn\'t drink cold water when they have a cold.","Children shouldn\'t to drink cold water when they have a cold."),
+E("You should see a doctor if your knee hurts.","You should seeing a doctor if your knee hurts."),
+E("Don\'t play with knives because you can get a cut!","Don\'t playing with knives because you can get a cut!")]},
+g4:{t:'Вправа 4. Утвори форму',i:'Впиши потрібну форму (наприклад: should stay, Don\'t touch).',items:[
+["If you have a high fever, you ___ (should / stay) in bed.",["should stay"]],
+["Max feels tired, so he ___ (should / take) a nap right now.",["should take"]],
+["Anna has a toothache, so she ___ (should not / eat) any chocolate.",["should not eat","shouldn\'t eat"]],
+["___ (not / touch) your eyes before you sanitise your hands!",["don\'t touch","do not touch"]],
+["Tom caught a virus, so he ___ (should / visit) the doctor today.",["should visit"]],
+["___ (cover) your mouth with a tissue when you sneeze!",["cover"]],
+["Children ___ (should not / go) to school when they are ill.",["should not go","shouldn\'t go"]],
+["What ___ (should / I / do) if my arm hurts?",["should i do"]],
+["___ (not / drink) cold fizzy drinks when you have a sore throat!",["don\'t drink","do not drink"]],
+["You ___ (should / take) your temperature before calling the clinic.",["should take"]]]},
+g5:{t:'Вправа 5. Граматика в контексті (A/B)',i:'Яке речення правильно дає пораду зі should або наказом?',items:[
+E("If you have a headache, you should turn off the loud music.","If you have a headache, you should turning off the loud music."),
+E("Don\'t go to work when you have a high fever.","Don\'t to go to work when you have a high fever."),
+E("She should drink warm tea with honey.","She should to drink warm tea with honey."),
+E("Don\'t play outside in the rain without a coat!","Doesn\'t play outside in the rain without a coat!"),
+E("You shouldn\'t walk on your leg if it hurts.","You shouldn\'t to walk on your leg if it hurts."),
+E("Put a band-aid on your cut right now!","Putting a band-aid on your cut right now!"),
+E("Mark shouldn\'t do heavy sports when he is ill.","Mark shouldn\'t doing heavy sports when he is ill."),
+E("Wear a mask when you go to public places during a pandemic!","Wears a mask when you go to public places during a pandemic!"),
+E("You should take this pill after breakfast.","You should to take this pill after breakfast."),
+E("Don\'t forget to wash your hands with soap!","Not forget to wash your hands with soap!")]}
+};
+const SP=[
+{id:'s0',t:'🤒 Картка 1: Застуда',a:'<b>Ситуація:</b> учень A почувається погано після гри надворі взимку.<br><b>Учень A:</b> розкажи B про симптоми (кашель, нежить) і спитай, що тобі робити.',b:'<b>Учень B:</b> порадь лежати в ліжку, пити теплий чай і подрімати.<br><i>Готово, коли: обидва питають і дають поради зі should та щонайменше двома словами-симптомами.</i>',ph:'«нежить» · «кашель» · «лежати в ліжку» · «тобі слід…» · «подрімати»'},
+{id:'s1',t:'🏥 Картка 2: У лікаря',a:'<b>Ситуація:</b> учень B прийшов до лікаря (учень A) з високою температурою.<br><b>Учень A (лікар):</b> спитай, що сталось, виміряй температуру й випиши рецепт.',b:'<b>Учень B:</b> поясни, коли почались симптоми, і спитай, чи потрібні ліки.<br><i>Готово, коли: A виміряв(-ла) температуру й дав(-ла) рецепт, а B описав(-ла) симптоми.</i>',ph:'«що сталось?» · «міряти температуру» · «рецепт» · «аптека» · «ліки»'},
+{id:'s2',t:'🤕 Картка 3: Спортивна травма',a:'<b>Ситуація:</b> учень A впав на уроці фізкультури й забив коліно.<br><b>Учень A:</b> покажи травму B і поясни, як це сталось.',b:'<b>Учень B:</b> перевір, чи немає порізів чи синців, і наклей лейкопластир.<br><i>Готово, коли: A розповів(-ла), як сталась травма, а B порадив(-ла) догляд.</i>',ph:'«впасти» · «синець» · «поріз» · «лейкопластир» · «боляче»'},
+{id:'s3',t:'📋 Картка 4: Правила гігієни в класі',a:'<b>Ситуація:</b> учні роблять шкільний плакат про здоров’я.<br><b>Учень A:</b> запропонуй три правила проти грипу під час пандемії (маски, антисептик).',b:'<b>Учень B:</b> додай два правила про чхання й кашель у серветку.<br><i>Готово, коли: обидва назвали щонайменше два чіткі правила в наказовому способі.</i>',ph:'«носити маску» · «дезінфікувати руки» · «чхати» · «прикривати» · «підхопити вірус»'},
+{id:'s4',t:'🍳 Картка 5: Нещасний випадок на кухні',a:'<b>Ситуація:</b> учень A допомагав на кухні й порізав палець ножем.<br><b>Учень A:</b> скажи B, що палець болить, і попроси допомоги.',b:'<b>Учень B:</b> скажи промити поріз і заклеїти його лейкопластиром.<br><i>Готово, коли: A пояснив(-ла), що сталось, а B дав(-ла) негайну пораду.</i>',ph:'«поріз» · «болить» · «прикрити» · «лейкопластир» · «не…»'},
+{id:'s5',t:'🤸 Картка 6: На майданчику',a:'<b>Ситуація:</b> учень B застряг на гімнастичних перекладинах.<br><b>Учень A:</b> помітив(-ла) B у біді, спитай, що сталось, і поклич на допомогу.',b:'<b>Учень B:</b> поясни, що в тебе болить рука й подряпаний лікоть.<br><i>Готово, коли: B пояснив(-ла), що застряг(-ла), а A запропонував(-ла) план дій.</i>',ph:'«застрягнути» · «гімнастичні перекладини» · «подряпина» · «боляче» · «що трапилось?»'},
+{id:'s6',t:'🍬 Картка 7: Зубний біль',a:'<b>Ситуація:</b> учень A має сильний зубний біль після солодощів.<br><b>Учень A:</b> поскаржся B на зубний біль і спитай, що робити.',b:'<b>Учень B:</b> порадь піти до стоматолога й більше не їсти шоколад.<br><i>Готово, коли: A описав(-ла) біль, а B дав(-ла) дві чіткі поради.</i>',ph:'«зубний біль» · «солодощі» · «піти до стоматолога» · «тобі не слід…» · «боляче»'},
+{id:'s7',t:'🐱 Картка 8: Алергія',a:'<b>Ситуація:</b> учень B починає без упину чхати поряд із котом.<br><b>Учень A:</b> спитай, чи B в порядку, і запропонуй паперову серветку.',b:'<b>Учень B:</b> поясни, що в тебе алергія на котів і треба вийти надвір.<br><i>Готово, коли: B пояснив(-ла) алергію, а A запропонував(-ла) допомогу.</i>',ph:'«чхати» · «алергія на…» · «серветка» · «що сталось?» · «вийти надвір»'},
+{id:'s8',t:'💻 Картка 9: Відпочинок і відновлення',a:'<b>Ситуація:</b> учень A має головний біль після п’яти годин навчання без перерви.<br><b>Учень A:</b> скажи B, що голова болить і ти втомився(-лась).',b:'<b>Учень B:</b> порадь вимкнути комп’ютер і подрімати.<br><i>Готово, коли: A описав(-ла) втому, а B дав(-ла) поради в наказовому способі.</i>',ph:'«головний біль» · «болить» · «вимкнути» · «подрімати» · «тобі слід…»'},
+{id:'s9',t:'💊 Картка 10: В аптеці',a:'<b>Ситуація:</b> учень B прийшов в аптеку по ліки для мами.<br><b>Учень A (аптекар):</b> попроси рецепт лікаря й поясни, як приймати ліки.',b:'<b>Учень B (покупець):</b> подай рецепт, заплати й побажай аптекарю гарного дня.<br><i>Готово, коли: обидва завершили покупку з лексикою аптеки.</i>',ph:'«аптека» · «рецепт» · «приймати ліки» · «двічі на день» · «одужуйте»'},
+{id:'m0',np:1,t:'🏫 Макро-сценарій 1: Шкільна медсестра',a:'<b>Контекст:</b> учень B погано почувається на уроці й іде до A (шкільної медсестри).<br><b>Учень A (медсестра):</b> спитай про симптоми, виміряй температуру, огляди синці й порізи й вирішуй, чи має B іти додому.',b:'<b>Учень B:</b> поясни, що з ранку в тебе температура, головний біль і нежить.<br><i>План розмови: привітання й «що сталось?» → температура й симптоми → поради зі should / shouldn\'t → лейкопластир або записка додому.</i>',ph:'«що сталось?» · «тобі слід…» · «тобі не слід…» · «лейкопластир»'},
+{id:'m1',np:1,t:'📢 Макро-сценарій 2: Кампанія з профілактики',a:'<b>Контекст:</b> учні-лідери готують інструктаж із безпеки для молодших школярів.<br><b>Учень A:</b> розкажи про правила гігієни (дезінфекція рук, миття з милом, прикривання кашлю).',b:'<b>Учень B:</b> розкажи про фізичну безпеку (дистанція, маски, залишатись вдома, коли хворий).<br><i>План розмови: тема → правила в наказовому способі → чому правила важливі → відповіді на запитання.</i>',ph:'«дезінфікуй руки!» · «носи маску!» · «не передавай вірус»'},
+{id:'m2',np:1,t:'🍵 Макро-сценарій 3: Догляд за хворим другом',a:'<b>Контекст:</b> учень A навідує вдома хворого на грип учня B.<br><b>Учень A:</b> принеси чай і фрукти, спитай, як B почувається, запропонуй спокійні заняття.',b:'<b>Учень B:</b> подякуй, опиши симптоми й розкажи, що призначив лікар.<br><i>План розмови: співчуття → поради лікаря й рецепт → відпочинок → побажання одужання.</i>',ph:'«бідолашний!» · «як ти почуваєшся?» · «тобі слід подрімати» · «одужуй!»'},
+{id:'d0',np:1,t:'🏠 Дискусія 1: Удома чи в школі',a:'<b>Питання:</b> чи мають учні лишатись удома навіть із легким нежитем?<br><b>Удома:</b> не заразиш клас і швидше одужаєш; день відпочинку не дасть хворобі стати серйозною.<br><b>У школі:</b> пропуски через дрібниці — відставання; маска й чисті руки достатні.<br>Що ти робиш, коли вранці прокидаєшся з нежитем? Як школа може допомогти хворим не відставати?',b:'',ph:'«залишатись удома» · «підхопити вірус» · «заразити інших» · «пропускати важливі уроки»'},
+{id:'d1',np:1,t:'🍯 Дискусія 2: Народні засоби чи ліки',a:'<b>Питання:</b> що краще при застуді: чай із лимоном чи таблетки з аптеки?<br><b>Народні засоби:</b> безпечніші, без побічних ефектів; при простій застуді зміцнюють імунітет.<br><b>Аптека:</b> швидше знижує температуру й біль; рецепт лікаря дає точне лікування.<br>Який улюблений засіб у твоїй родині? Чи пив(-ла) ти ліки без поради лікаря?',b:'',ph:'«приймати ліки» · «народні засоби» · «рецепт лікаря» · «швидко одужати»'},
+{id:'d2',np:1,t:'😷 Дискусія 3: Гігієна після пандемії',a:'<b>Питання:</b> чи варто носити маски в людних місцях щозими?<br><b>За:</b> маски захищають вразливих людей, а гігієна зменшує кількість днів хвороби.<br><b>Особистий вибір:</b> кожен має вирішувати сам; постійні маски незручні.<br>Як змінились твої гігієнічні звички за кілька років? Яке найефективніше правило, щоб не хворіти взимку?',b:'',ph:'«носити маску» · «дезінфікувати руки» · «соціальна дистанція» · «захищати здоров’я»'}
+];
+const SPPTS=10,$=(s,e=document)=>e.querySelector(s);
+let S={};try{S=JSON.parse(localStorage.getItem('u93')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('u93',JSON.stringify(S))}catch(e){}};
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/[?.!]/g,'').replace(/\s+/g,' ').trim();
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function mkItem(id,i){
+ const [q,a,o,w]=EX[id].items[i],key=id+i,el=document.createElement('div');let tries=0;
+ el.className='item';
+ el.innerHTML=`<div class="n">${i+1}</div><div class="b"><p class="q">${q.replace('___','<span class="blank"></span>')}</p><div class="ctl"></div><p class="fb"></p></div>`;
+ const ctl=$('.ctl',el),fb=$('.fb',el);
+ const show=(p,ok)=>{el.classList.add(ok?'ok':'bad');ctl.innerHTML='';fb.innerHTML=(ok?`✅ +${p} б. `:`❌ Правильна відповідь: <b>${a[0]}</b>. `)+(w||'')};
+ if(S[key]!=null){show(S[key],S[key]>0);return el}
+ const check=v=>{
+  if(a.map(norm).includes(norm(v))){S[key]=tries?5:10;save();show(S[key],1);upd()}
+  else if(tries++){S[key]=0;save();show(0,0);upd()}
+  else fb.textContent='🤔 Не зовсім. Спробуй ще раз — за другу спробу 5 балів.';
+ };
+ if(o){shuf(o).forEach(t=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{b.disabled=true;check(t)};ctl.append(b)})}
+ else{const inp=document.createElement('input'),b=document.createElement('button');inp.placeholder='Твоя відповідь';inp.autocomplete='off';inp.setAttribute('aria-label','Відповідь');b.textContent='Перевірити';b.className='go';
+  const go=()=>{if(inp.value.trim())check(inp.value)};b.onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()};ctl.append(inp,b)}
+ return el;
+}
+function build(){
+ const nav=$('#nav'),main=$('#main');nav.innerHTML='';main.innerHTML='';
+ TABS.forEach((t,k)=>{
+  const b=document.createElement('button');b.textContent=t.name;b.dataset.t=t.id;b.onclick=()=>open(t.id);nav.append(b);
+  const p=document.createElement('section');p.className='panel';p.id='p-'+t.id;p.innerHTML=`<div class="intro">${t.intro}</div>`;
+  t.ex.forEach(id=>{const e=EX[id],d=document.createElement('div');d.className='ex';d.id='ex-'+id;
+   d.innerHTML=`<span class="sc"></span><h2>${e.t}</h2><p class="ins">${e.i}</p>`;
+   e.items.forEach((_,i)=>d.append(mkItem(id,i)));p.append(d)});
+  if(t.id==='speak')SP.forEach(s=>{const c=document.createElement('div');c.className='card';
+   c.innerHTML=`<h3>${s.t}</h3><div class="who">${s.a}</div>${s.b?`<div class="who">${s.b}</div>`:''}<p class="ph">💬 Скажи англійською: ${s.ph}</p>${s.np?'<p class="np">Без балів, для практики</p>':`<label class="chk"><input type="checkbox" ${S[s.id]?'checked':''}> Ми це зробили (+${SPPTS} б.)</label>`}`;
+   const ck=$('input',c);if(ck)ck.onchange=e=>{if(e.target.checked)S[s.id]=SPPTS;else delete S[s.id];save();upd()};p.append(c)});
+  const nx=document.createElement('div');nx.className='next';
+  if(TABS[k+1]){const nb=document.createElement('button');nb.textContent='Далі: '+TABS[k+1].name+' →';nb.onclick=()=>open(TABS[k+1].id);nx.append(nb)}else nx.textContent='🎉 Це був останній розділ. Молодець!';
+  p.append(nx);main.append(p)});
+ open(TABS[0].id);upd();
+}
+function open(id){document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));scrollTo(0,0)}
+function upd(){
+ let tot=0,max=0;
+ TABS.forEach(t=>{let done=true;
+  t.ex.forEach(id=>{const n=EX[id].items.length;let s=0,c=0;for(let i=0;i<n;i++){if(S[id+i]!=null){s+=S[id+i];c++}}
+   tot+=s;max+=n*10;if(c<n)done=false;$('#ex-'+id+' .sc').textContent=`${s} / ${n*10}`});
+  if(t.id==='speak'){SP.filter(s=>!s.np).forEach(s=>{max+=SPPTS;if(S[s.id])tot+=SPPTS;else done=false})}
+  $(`nav button[data-t="${t.id}"]`).classList.toggle('full',done)});
+ $('#pts').textContent=tot;$('#max').textContent=max;$('#fill').style.width=(max?tot/max*100:0)+'%';
+ const r=max?tot/max:0;$('#rank').textContent=r>=.9?'🏆 Майстер шопінгу':r>=.7?'🥇 Чудово!':r>=.4?'🥈 Гарний прогрес':r>0?'🌱 Початок є':'';
+}
+$('#reset').onclick=()=>{if(confirm('Скинути всі бали й відповіді?')){S={};save();build()}};
+build();
+</script>
+</body>
+</html>
